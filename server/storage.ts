@@ -63,6 +63,12 @@ export class MemStorage implements IStorage {
     this.createAdminSecretCode({ code: "ADMIN789", city: "Chicago" });
     this.createAdminSecretCode({ code: "ADMIN101", city: "Houston" });
     this.createAdminSecretCode({ code: "ADMIN202", city: "Phoenix" });
+    // Add more codes for additional cities
+    this.createAdminSecretCode({ code: "CLEAN_DELHI", city: "Delhi" });
+    this.createAdminSecretCode({ code: "CLEAN_MUMBAI", city: "Mumbai" });
+    this.createAdminSecretCode({ code: "CLEAN_BANGALORE", city: "Bangalore" });
+    this.createAdminSecretCode({ code: "CLEAN_LONDON", city: "London" });
+    this.createAdminSecretCode({ code: "CLEAN_TOKYO", city: "Tokyo" });
   }
 
   // User operations
