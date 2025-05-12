@@ -234,4 +234,17 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Uncomment to use in-memory storage
+// export const storage = new MemStorage();
+
+// Import database storage
+import { DatabaseStorage, initializeAdminSecretCodes } from "./database-storage";
+
+// Use database storage instead of in-memory storage
+export const storage = new DatabaseStorage();
+
+// Initialize admin secret codes in the database
+// This will be called when the server starts
+initializeAdminSecretCodes().catch(err => {
+  console.error("Failed to initialize admin secret codes:", err);
+});
