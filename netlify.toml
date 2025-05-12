@@ -1,7 +1,9 @@
 [build]
-  command = "npm install && npm run build"
-  publish = "dist/public"
+  base = "."
+  command = "npm run build:netlify"
+  publish = "client/dist"
   functions = "netlify/functions"
+  environment = { NPM_FLAGS = "--legacy-peer-deps" }
 
 [build.environment]
   NODE_VERSION = "20"
