@@ -3,12 +3,12 @@
   command = "npm run build:netlify"
   publish = "client/dist"
   functions = "netlify/functions"
-  environment = { NPM_FLAGS = "--legacy-peer-deps" }
 
 [build.environment]
   NODE_VERSION = "20"
-  NPM_FLAGS = "--version"
+  NPM_FLAGS = "--legacy-peer-deps"
   NPM_VERBOSE = "true"
+  CI = "false"
 
 # Single Page App (SPA) support - redirect all routes to index.html
 [[redirects]]
