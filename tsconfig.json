@@ -10,11 +10,11 @@
     "jsx": "preserve",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
+    "noEmit": false,
+    "outDir": "./dist",
     "allowSyntheticDefaultImports": true,
     "types": ["node", "vite/client"],
     "baseUrl": ".",
-    "outDir": "./dist",
     "rootDir": ".",
     "paths": {
       "@/*": ["./client/src/*"],

@@ -5,9 +5,9 @@
   "license": "MIT",
   "scripts": {
     "dev": "NODE_ENV=development tsx server/index.ts",
-    "build": "cd client && npm install && npm run build",
-    "start": "NODE_ENV=production node dist/index.js",
-    "check": "tsc",
+    "build": "tsc && cd client && npm install && npm run build",
+    "start": "NODE_ENV=production node dist/server/index.js",
+    "check": "tsc --noEmit",
     "db:push": "drizzle-kit push",
     "test:db": "tsx test-db.ts"
   },
