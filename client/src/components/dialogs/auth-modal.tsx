@@ -108,15 +108,27 @@ const AuthModal: React.FC<AuthModalProps> = ({
   // Handle login form submission
   const onLoginSubmit = async (values: LoginFormValues) => {
     setError(null);
+    console.log("Auth modal: Attempting login with", { 
+      email: values.email, 
+      role: userType 
+    });
+    
     try {
-      await login({
+      const result = await login({
         email: values.email,
         password: values.password,
         role: userType,
       });
+      
+      console.log("Auth modal: Login successful", { 
+        userId: result?.id, 
+        role: result?.role 
+      });
+      
       onClose();
       loginForm.reset();
     } catch (err: any) {
+      console.error("Auth modal: Login error", err);
       setError(err.message || "Failed to login. Please try again.");
     }
   };
@@ -124,17 +136,29 @@ const AuthModal: React.FC<AuthModalProps> = ({
   // Handle signup form submission
   const onSignupSubmit = async (values: SignupFormValues) => {
     setError(null);
+    console.log("Auth modal: Attempting signup with", { 
+      email: values.email, 
+      role: userType,
+      city: values.city
+    });
+    
     try {
       const { confirmPassword, termsAccepted, ...registerData } = values;
       
-      await register({
+      const result = await register({
         ...registerData,
         role: userType,
+      });
+      
+      console.log("Auth modal: Registration successful", { 
+        userId: result?.id, 
+        role: result?.role 
       });
       
       onClose();
       signupForm.reset();
     } catch (err: any) {
+      console.error("Auth modal: Registration error", err);
       setError(err.message || "Failed to register. Please try again.");
     }
   };

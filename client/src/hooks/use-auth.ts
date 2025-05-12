@@ -57,11 +57,23 @@ export function useAuth() {
   // Login mutation
   const loginMutation = useMutation({
     mutationFn: async (credentials: Login) => {
+      console.log("Logging in with:", { email: credentials.email, role: credentials.role });
       const res = await apiRequest("POST", "/api/auth/login", credentials);
+      
+      if (!res.ok) {
+        console.error("Login failed:", res.status, res.statusText);
+        const errorText = await res.text();
+        throw new Error(errorText || "Login failed");
+      }
+      
       return res.json();
     },
     onSuccess: (data) => {
+      console.log("Login successful:", { id: data.id, role: data.role });
       queryClient.setQueryData(["/api/auth/me"], data);
+      
+      // Invalidate the current user query to force a refetch
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
       
       // Redirect to appropriate dashboard
       if (data.role === "admin") {
@@ -71,6 +83,7 @@ export function useAuth() {
       }
     },
     onError: (error: any) => {
+      console.error("Login mutation error:", error);
       setError(error.message || "Login failed");
       throw error;
     },
@@ -79,11 +92,28 @@ export function useAuth() {
   // Register mutation
   const registerMutation = useMutation({
     mutationFn: async (userData: RegisterData) => {
+      console.log("Registering user:", { 
+        email: userData.email, 
+        role: userData.role, 
+        city: userData.city 
+      });
+      
       const res = await apiRequest("POST", "/api/auth/register", userData);
+      
+      if (!res.ok) {
+        console.error("Registration failed:", res.status, res.statusText);
+        const errorText = await res.text();
+        throw new Error(errorText || "Registration failed");
+      }
+      
       return res.json();
     },
     onSuccess: (data) => {
+      console.log("Registration successful:", { id: data.id, role: data.role });
       queryClient.setQueryData(["/api/auth/me"], data);
+      
+      // Invalidate the current user query to force a refetch
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
       
       // Redirect to appropriate dashboard
       if (data.role === "admin") {
@@ -93,6 +123,7 @@ export function useAuth() {
       }
     },
     onError: (error: any) => {
+      console.error("Registration mutation error:", error);
       setError(error.message || "Registration failed");
       throw error;
     },
@@ -101,14 +132,27 @@ export function useAuth() {
   // Logout mutation
   const logoutMutation = useMutation({
     mutationFn: async () => {
+      console.log("Logging out user");
       const res = await apiRequest("POST", "/api/auth/logout", {});
+      
+      if (!res.ok) {
+        console.error("Logout failed:", res.status, res.statusText);
+        const errorText = await res.text();
+        throw new Error(errorText || "Logout failed");
+      }
+      
       return res.json();
     },
     onSuccess: () => {
+      console.log("Logout successful");
       queryClient.setQueryData(["/api/auth/me"], null);
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      
+      // Redirect to home page
+      window.location.href = "/";
     },
     onError: (error: any) => {
+      console.error("Logout mutation error:", error);
       setError(error.message || "Logout failed");
     },
   });
@@ -117,7 +161,23 @@ export function useAuth() {
   const login = useCallback(
     async (credentials: Login) => {
       setError(null);
-      return loginMutation.mutateAsync(credentials);
+      try {
+        console.log("useAuth: login function called with", { 
+          email: credentials.email, 
+          role: credentials.role 
+        });
+        
+        const result = await loginMutation.mutateAsync(credentials);
+        console.log("useAuth: login mutation completed with result", { 
+          id: result?.id, 
+          role: result?.role 
+        });
+        
+        return result;
+      } catch (error) {
+        console.error("useAuth: login error", error);
+        throw error;
+      }
     },
     [loginMutation]
   );
