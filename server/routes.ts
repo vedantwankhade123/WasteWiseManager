@@ -27,15 +27,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Session middleware
   app.use(
     session({
-      cookie: { maxAge: 86400000 }, // 24 hours
+      cookie: { 
+        maxAge: 86400000, // 24 hours
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: false // Set to true in production with HTTPS
+      },
       store: new MemoryStoreSession({
         checkPeriod: 86400000 // prune expired entries every 24h
       }),
-      resave: false,
+      resave: true,
       saveUninitialized: false,
-      secret: process.env.SESSION_SECRET || "clean-city-secret"
+      secret: process.env.SESSION_SECRET || "clean-city-secret",
+      name: 'cleanCity.sid' // Custom name to avoid default connect.sid
     })
   );
+  
+  // Debug middleware to log all requests and session info
+  app.use((req, res, next) => {
+    console.log(`Request ${req.method} ${req.url} - Session:`, req.session);
+    next();
+  });
   
   // Helper function to handle zod validation
   const validateRequest = <T>(schema: z.ZodType<T>, data: any): { success: boolean; data?: T; error?: string } => {
