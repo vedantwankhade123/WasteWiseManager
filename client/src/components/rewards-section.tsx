@@ -72,14 +72,14 @@ const RewardsSection: React.FC = () => {
                   <div className="flex items-center justify-between pb-3 border-b border-white/30">
                     <div>
                       <h4 className="font-semibold text-lg">1000 Points</h4>
-                      <p className="text-white/80">$12 Cash Reward</p>
+                      <p className="text-white/80">₹1000 Cash Reward</p>
                     </div>
                     <Coins className="h-6 w-6" />
                   </div>
                   <div className="flex items-center justify-between pb-3 border-b border-white/30">
                     <div>
                       <h4 className="font-semibold text-lg">2500 Points</h4>
-                      <p className="text-white/80">$35 Cash Reward</p>
+                      <p className="text-white/80">₹2500 Cash Reward</p>
                     </div>
                     <Coins className="h-6 w-6" />
                   </div>
