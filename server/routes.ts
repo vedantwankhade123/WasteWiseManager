@@ -52,9 +52,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Auth middleware to protect routes
   const requireAuth = (req: Request, res: Response, next: Function) => {
+    console.log("requireAuth middleware - Session:", req.session);
     if (!req.session.userId) {
+      console.log("requireAuth: No userId in session, returning 401");
       return res.status(401).json({ message: "Unauthorized" });
     }
+    console.log("requireAuth: User is authenticated, proceeding");
     next();
   };
 
@@ -185,19 +188,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Get current user
   app.get("/api/auth/me", async (req, res) => {
+    console.log("GET /api/auth/me - Session:", req.session);
+    
     if (!req.session.userId) {
+      console.log("No userId in session, returning 401");
       return res.status(401).json({ message: "Not authenticated" });
     }
     
     try {
+      console.log("Fetching user with ID:", req.session.userId);
       const user = await storage.getUser(req.session.userId);
+      
       if (!user) {
+        console.log("User not found in database, destroying session");
         req.session.destroy(() => {});
         return res.status(401).json({ message: "User not found" });
       }
       
       // Return user data excluding password
       const { password, ...userWithoutPassword } = user;
+      console.log("User found, returning data:", { 
+        id: userWithoutPassword.id, 
+        email: userWithoutPassword.email,
+        role: userWithoutPassword.role 
+      });
+      
       res.json(userWithoutPassword);
     } catch (error) {
       console.error("Get current user error:", error);

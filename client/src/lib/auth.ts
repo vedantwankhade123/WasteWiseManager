@@ -74,19 +74,26 @@ export async function logoutUser(): Promise<void> {
  */
 export async function getCurrentUser(): Promise<User | null> {
   try {
+    console.log("Fetching current user");
     const response = await fetch("/api/auth/me", {
       credentials: "include",
     });
     
+    console.log("Current user response status:", response.status);
+    
     if (response.status === 401) {
+      console.log("User not authenticated");
       return null;
     }
     
     if (!response.ok) {
+      console.error("Failed to fetch user:", response.status, response.statusText);
       throw new Error("Failed to fetch user");
     }
     
-    return await response.json();
+    const userData = await response.json();
+    console.log("Current user data:", userData ? { id: userData.id, role: userData.role } : null);
+    return userData;
   } catch (error) {
     console.error("Get current user error:", error);
     return null;
