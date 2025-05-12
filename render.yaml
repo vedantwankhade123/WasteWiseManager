@@ -2,7 +2,24 @@ services:
   - type: web
     name: wastewise-manager
     env: node
-    buildCommand: npm install && npm run build
+    buildCommand: |
+      # Install root dependencies
+      npm install
+      
+      # Build server first
+      npm run build:server
+      
+      # Then build client
+      cd client
+      npm install
+      npm run build
+      cd ..
+      
+      # Ensure dist directory exists
+      mkdir -p dist/client
+      
+      # Copy client build to dist
+      cp -r client/dist/* dist/client/
     startCommand: npm start
     envVars:
       - key: NODE_ENV

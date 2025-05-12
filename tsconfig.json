@@ -13,32 +13,28 @@
     "noEmit": false,
     "outDir": "./dist",
     "allowSyntheticDefaultImports": true,
-    "types": ["node", "vite/client"],
-    "baseUrl": ".",
-    "rootDir": ".",
-    "paths": {
-      "@/*": ["./client/src/*"],
-      "@shared/*": ["./shared/*"],
-      "@assets/*": ["./attached_assets/*"]
-    },
+    "types": ["node"],
     "typeRoots": [
       "./node_modules/@types",
       "./types"
-    ]
+    ],
+    "baseUrl": ".",
+    "rootDir": ".",
+    "paths": {
+      "@shared/*": ["./shared/*"],
+      "@assets/*": ["./attached_assets/*"]
+    }
   },
   "include": [
-    "client/src/**/*",
-    "shared/**/*",
     "server/**/*",
-    "**/*.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.vue"
+    "shared/**/*",
+    "**/*.d.ts"
   ],
   "exclude": [
     "node_modules",
     "build",
     "dist",
+    "client",
     "**/*.test.ts",
     "**/*.spec.ts"
   ]

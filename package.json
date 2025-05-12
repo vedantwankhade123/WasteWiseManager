@@ -5,13 +5,16 @@
   "license": "MIT",
   "scripts": {
     "dev": "NODE_ENV=development tsx server/index.ts",
-    "build": "tsc && cd client && npm install && npm run build",
+    "build:server": "tsc -p tsconfig.build.json",
+    "build:client": "cd client && npm install && npm run build",
+    "build": "npm run build:server && npm run build:client",
     "start": "NODE_ENV=production node dist/server/index.js",
     "check": "tsc --noEmit",
     "db:push": "drizzle-kit push",
     "test:db": "tsx test-db.ts"
   },
   "dependencies": {
+    "vite": "^6.3.5",
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",
     "@neondatabase/serverless": "^0.10.4",
@@ -103,8 +106,7 @@
     "tailwindcss": "^3.4.17",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.4",
-    "typescript": "^5.6.3",
-    "vite": "^6.3.5"
+    "typescript": "^5.6.3"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"
