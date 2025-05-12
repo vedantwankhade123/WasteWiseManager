@@ -103,9 +103,9 @@ export function getStatusIcon(status: string): string {
   }
 }
 
-// Format reward points with a "+" prefix
+// Format reward points with a "+" prefix and ₹ symbol (Indian Rupees)
 export function formatRewardPoints(points: number): string {
-  return points > 0 ? `+${points}` : `${points}`;
+  return points > 0 ? `+₹${points}` : `₹${points}`;
 }
 
 // Validate that a form file input is an image with allowed extensions

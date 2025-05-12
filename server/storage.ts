@@ -88,6 +88,8 @@ export class MemStorage implements IStorage {
     const newUser: User = { 
       ...user, 
       id, 
+      role: user.role || "user",
+      secretCode: user.secretCode || null,
       isActive: true, 
       rewardPoints: 0
     };
