@@ -7,24 +7,31 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
-const API_URL = import.meta.env.PROD
-  ? import.meta.env.VITE_API_URL || window.location.origin
-  : '';
-
-export const apiRequest = async (
+export async function apiRequest(
   method: string,
-  path: string,
-  body?: any,
-  headers?: HeadersInit
-) => {
-  const response = await fetch(API_URL + path, {
-    method,
-    headers: body ? { "Content-Type": "application/json" } : headers,
-    body: body ? JSON.stringify(body) : undefined,
-    credentials: "include",
-  });
-  return response;
-};
+  url: string,
+  data?: unknown | undefined,
+): Promise<Response> {
+  try {
+    console.log(`Making ${method} request to ${url}`);
+    
+    const res = await fetch(url, {
+      method,
+      headers: data ? { "Content-Type": "application/json" } : {},
+      body: data ? JSON.stringify(data) : undefined,
+      credentials: "include",
+    });
+    
+    // For debugging purposes, let's log the response status
+    console.log(`Response status: ${res.status} ${res.statusText}`);
+    
+    // Don't throw automatically, return the response and let the caller handle errors
+    return res;
+  } catch (error) {
+    console.error("API request error:", error);
+    throw error;
+  }
+}
 
 type UnauthorizedBehavior = "returnNull" | "throw";
 export const getQueryFn: <T>(options: {
