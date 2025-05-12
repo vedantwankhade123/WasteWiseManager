@@ -1,14 +1,14 @@
-import { 
-  users, 
-  User, 
-  InsertUser, 
-  adminSecretCodes, 
-  AdminSecretCode, 
+import {
+  users,
+  User,
+  InsertUser,
+  adminSecretCodes,
+  AdminSecretCode,
   InsertAdminSecretCode,
   reports,
   Report,
   InsertReport,
-  UpdateReportStatus
+  UpdateReportStatus,
 } from "@shared/schema";
 import { IStorage } from "./storage";
 import { db } from "./db";
@@ -16,7 +16,6 @@ import { eq, and } from "drizzle-orm";
 
 // Database storage implementation
 export class DatabaseStorage implements IStorage {
-  
   // User operations
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
@@ -36,23 +35,23 @@ export class DatabaseStorage implements IStorage {
     const userData = {
       ...user,
       role: user.role || "user",
-      secretCode: user.secretCode || null
+      secretCode: user.secretCode || null,
     };
 
-    const [newUser] = await db
-      .insert(users)
-      .values(userData)
-      .returning();
+    const [newUser] = await db.insert(users).values(userData).returning();
     return newUser;
   }
 
-  async updateUser(id: number, userData: Partial<User>): Promise<User | undefined> {
+  async updateUser(
+    id: number,
+    userData: Partial<User>,
+  ): Promise<User | undefined> {
     const [updatedUser] = await db
       .update(users)
       .set(userData)
       .where(eq(users.id, id))
       .returning();
-    
+
     return updatedUser || undefined;
   }
 
@@ -61,30 +60,24 @@ export class DatabaseStorage implements IStorage {
       .delete(users)
       .where(eq(users.id, id))
       .returning({ id: users.id });
-    
+
     return result.length > 0;
   }
 
   async getAllUsers(): Promise<User[]> {
     return await db.select().from(users);
   }
-  
+
   async getUsersByCity(city: string): Promise<User[]> {
-    return await db
-      .select()
-      .from(users)
-      .where(eq(users.city, city));
+    return await db.select().from(users).where(eq(users.city, city));
   }
-  
+
   async getUserAdminsCountByCity(city: string): Promise<number> {
     const result = await db
       .select()
       .from(users)
-      .where(and(
-        eq(users.city, city),
-        eq(users.role, "admin")
-      ));
-    
+      .where(and(eq(users.city, city), eq(users.role, "admin")));
+
     return result.length;
   }
 
@@ -94,16 +87,18 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(adminSecretCodes)
       .where(eq(adminSecretCodes.code, code));
-    
+
     return secretCode || undefined;
   }
 
-  async createAdminSecretCode(secretCode: InsertAdminSecretCode): Promise<AdminSecretCode> {
+  async createAdminSecretCode(
+    secretCode: InsertAdminSecretCode,
+  ): Promise<AdminSecretCode> {
     const [newSecretCode] = await db
       .insert(adminSecretCodes)
       .values({ ...secretCode, isUsed: false })
       .returning();
-    
+
     return newSecretCode;
   }
 
@@ -113,7 +108,7 @@ export class DatabaseStorage implements IStorage {
       .set({ isUsed: true })
       .where(eq(adminSecretCodes.id, id))
       .returning({ id: adminSecretCodes.id });
-    
+
     return result.length > 0;
   }
 
@@ -123,19 +118,13 @@ export class DatabaseStorage implements IStorage {
 
   // Report operations
   async getReport(id: number): Promise<Report | undefined> {
-    const [report] = await db
-      .select()
-      .from(reports)
-      .where(eq(reports.id, id));
-    
+    const [report] = await db.select().from(reports).where(eq(reports.id, id));
+
     return report || undefined;
   }
 
   async getReportsByUserId(userId: number): Promise<Report[]> {
-    return await db
-      .select()
-      .from(reports)
-      .where(eq(reports.userId, userId));
+    return await db.select().from(reports).where(eq(reports.userId, userId));
   }
 
   async getAllReports(): Promise<Report[]> {
@@ -143,31 +132,28 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getReportsByStatus(status: string): Promise<Report[]> {
-    return await db
-      .select()
-      .from(reports)
-      .where(eq(reports.status, status));
+    return await db.select().from(reports).where(eq(reports.status, status));
   }
-  
+
   async getReportsByCity(city: string): Promise<Report[]> {
     // For this we need to join with users to filter by city
     // First get all users from that city
     const usersInCity = await this.getUsersByCity(city);
-    const userIds = usersInCity.map(user => user.id);
-    
+    const userIds = usersInCity.map((user) => user.id);
+
     if (userIds.length === 0) {
       return [];
     }
-    
+
     // Then get all reports from those users
     // This isn't ideal but works for now - with more complex SQL we could do this in one query
     const allReports = await this.getAllReports();
-    return allReports.filter(report => userIds.includes(report.userId));
+    return allReports.filter((report) => userIds.includes(report.userId));
   }
 
   async createReport(report: InsertReport): Promise<Report> {
     const now = new Date();
-    
+
     const [newReport] = await db
       .insert(reports)
       .values({
@@ -178,46 +164,49 @@ export class DatabaseStorage implements IStorage {
         adminNotes: null,
         assignedAdminId: null,
         rewardPoints: null,
-        completedAt: null
+        completedAt: null,
       })
       .returning();
-    
+
     return newReport;
   }
 
-  async updateReportStatus(id: number, statusData: UpdateReportStatus): Promise<Report | undefined> {
+  async updateReportStatus(
+    id: number,
+    statusData: UpdateReportStatus,
+  ): Promise<Report | undefined> {
     // First get the current report
     const report = await this.getReport(id);
     if (!report) return undefined;
-    
+
     const now = new Date();
     const updateData: any = {
       ...statusData,
-      updatedAt: now
+      updatedAt: now,
     };
-    
+
     // If status is changing to completed, set completedAt and rewardPoints
     if (statusData.status === "completed" && report.status !== "completed") {
       updateData.completedAt = now;
       updateData.rewardPoints = 50; // Default reward points
-      
+
       // Update user's reward points
       if (report.userId) {
         const user = await this.getUser(report.userId);
         if (user) {
           await this.updateUser(user.id, {
-            rewardPoints: (user.rewardPoints || 0) + 50
+            rewardPoints: (user.rewardPoints || 0) + 50,
           });
         }
       }
     }
-    
+
     const [updatedReport] = await db
       .update(reports)
       .set(updateData)
       .where(eq(reports.id, id))
       .returning();
-    
+
     return updatedReport || undefined;
   }
 
@@ -226,7 +215,7 @@ export class DatabaseStorage implements IStorage {
       .delete(reports)
       .where(eq(reports.id, id))
       .returning({ id: reports.id });
-    
+
     return result.length > 0;
   }
 }
@@ -234,11 +223,11 @@ export class DatabaseStorage implements IStorage {
 // Initialize admin secret codes in the database
 export async function initializeAdminSecretCodes() {
   const existingCodes = await db.select().from(adminSecretCodes);
-  
+
   // Only add default codes if none exist
   if (existingCodes.length === 0) {
     console.log("Initializing admin secret codes in database...");
-    
+
     // Add default admin secret codes
     const defaultCodes = [
       { code: "ADMIN123", city: "New York" },
@@ -246,19 +235,18 @@ export async function initializeAdminSecretCodes() {
       { code: "ADMIN789", city: "Chicago" },
       { code: "ADMIN101", city: "Houston" },
       { code: "ADMIN202", city: "Phoenix" },
+      { code: "CLEAN_AMRAVATI", city: "Amravati" },
       { code: "CLEAN_DELHI", city: "Delhi" },
       { code: "CLEAN_MUMBAI", city: "Mumbai" },
       { code: "CLEAN_BANGALORE", city: "Bangalore" },
       { code: "CLEAN_LONDON", city: "London" },
-      { code: "CLEAN_TOKYO", city: "Tokyo" }
+      { code: "CLEAN_TOKYO", city: "Tokyo" },
     ];
-    
+
     for (const codeData of defaultCodes) {
-      await db
-        .insert(adminSecretCodes)
-        .values({ ...codeData, isUsed: false });
+      await db.insert(adminSecretCodes).values({ ...codeData, isUsed: false });
     }
-    
+
     console.log("Admin secret codes initialized successfully");
   }
 }
