@@ -257,13 +257,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Create a new report
   app.post("/api/reports", requireAuth, async (req, res) => {
+    console.log("Received report data:", req.body);
+    console.log("User session:", { userId: req.session.userId, role: req.session.role });
+    
+    // Validate the request
     const validation = validateRequest(insertReportSchema, req.body);
     
     if (!validation.success) {
+      console.log("Validation failed:", validation.error);
       return res.status(400).json({ message: validation.error });
     }
     
     const reportData = validation.data!;
+    console.log("Validated report data:", reportData);
     
     try {
       // Assign current user as the report owner
@@ -272,6 +278,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId: req.session.userId
       });
       
+      console.log("Report created successfully:", report.id);
       res.status(201).json(report);
     } catch (error) {
       console.error("Create report error:", error);

@@ -71,6 +71,7 @@ const ReportForm: React.FC = () => {
       longitude: "",
       address: "",
       userId: user?.id || 0,
+      imageUrl: "", // Add default imageUrl field
     },
   });
 
@@ -104,6 +105,8 @@ const ReportForm: React.FC = () => {
   // Create report mutation
   const createReportMutation = useMutation({
     mutationFn: async (data: any) => {
+      console.log("Submitting report with data:", data);
+      
       // Convert image to base64 if it's a File
       let imageUrl = "";
       if (data.imageFile instanceof File) {
@@ -116,12 +119,30 @@ const ReportForm: React.FC = () => {
       // Remove imageFile and use imageUrl
       const { imageFile, ...reportData } = data;
       
-      const response = await apiRequest("POST", "/api/reports", {
+      // Log the actual data being sent to the server
+      console.log("Sending to server:", {
         ...reportData,
-        imageUrl,
+        imageUrl: imageUrl.substring(0, 50) + "..." // Truncate for logging
       });
       
-      return response.json();
+      try {
+        const response = await apiRequest("POST", "/api/reports", {
+          ...reportData,
+          imageUrl,
+        });
+        
+        // Check if response is ok
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("Server error:", errorData);
+          throw new Error(errorData.message || "Failed to submit report");
+        }
+        
+        return response.json();
+      } catch (error) {
+        console.error("Report submission error:", error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/reports"] });
