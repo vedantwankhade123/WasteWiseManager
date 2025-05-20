@@ -61,16 +61,16 @@ const Navbar: React.FC<NavbarProps> = ({ transparent = false }) => {
     <header className={navbarClass}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          <div className="flex items-center">
+          <div className="flex items-center mt-2.5 ml-[10px]">
             <Link href="/">
-              <a className="text-primary text-2xl font-bold">
+              <a className="text-primary text-3xl font-bold">
                 Clean<span className="text-secondary">City</span>
               </a>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8 items-center">
+          <nav className="hidden md:flex space-x-8 items-center mt-2.5">
             <Link href="/">
               <a className={linkClass}>Home</a>
             </Link>
@@ -89,7 +89,7 @@ const Navbar: React.FC<NavbarProps> = ({ transparent = false }) => {
           </nav>
 
           {/* Auth buttons or user menu */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-4 mt-3.5 mr-[-50px]">
             {isAuthenticated ? (
               <div className="flex items-center gap-4">
                 {/* Notification bell */}
@@ -166,14 +166,14 @@ const Navbar: React.FC<NavbarProps> = ({ transparent = false }) => {
               <>
                 <Button
                   variant="outline"
-                  className="border-primary text-primary hover:bg-primary hover:text-white"
+                  className="border-primary text-primary hover:bg-primary hover:text-white rounded-full min-w-[120px]"
                   onClick={() => handleOpenLoginModal("user")}
                 >
                   Login
                 </Button>
                 <Button
                   variant="default"
-                  className="bg-primary text-white hover:bg-primary-dark"
+                  className="bg-primary text-white hover:bg-primary-dark rounded-full min-w-[120px]"
                   onClick={() => handleOpenSignupModal("user")}
                 >
                   Sign Up

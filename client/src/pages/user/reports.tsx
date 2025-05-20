@@ -1,7 +1,8 @@
-import React, { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import React, { useState, useMemo } from "react";
+import { useQuery, useMutation, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
 import {
   Card,
   CardContent,
@@ -23,10 +24,16 @@ import ReportCard from "@/components/report-card";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import { Helmet } from "react-helmet";
+import { apiRequest } from "@/lib/api";
+import { toast } from "@/hooks/use-toast";
+
+
 
 const UserReports: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   // Fetch user reports
   const { 
@@ -36,19 +43,69 @@ const UserReports: React.FC = () => {
     error 
   } = useQuery<Report[]>({
     queryKey: ["/api/reports"],
+    queryFn: async (): Promise<Report[]> => {
+      try {
+        const data = await apiRequest<Report[]>("/reports", "GET");
+        return Array.isArray(data) ? data : [];
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          toast({
+            title: "Error fetching reports",
+            description: err.message,
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Error fetching reports",
+            description: "Failed to fetch reports",
+            variant: "destructive"
+          });
+        }
+        return [];
+      }
+    },
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  // Filter reports based on status and search query
-  const filteredReports = reports?.filter(report => {
-    const matchesStatus = statusFilter === "all" || report.status === statusFilter;
-    const matchesSearch = !searchQuery || 
+  // Filter reports based on status
+  const filteredReports = useMemo<Report[]>(() => {
+    if (!reports) return [];
+    return reports.filter((report: Report) => 
+      statusFilter === "all" || report.status === statusFilter
+    );
+  }, [reports, statusFilter]);
+
+  // Handle search
+  const searchFilteredReports = useMemo<Report[]>(() => {
+    return filteredReports.filter((report: Report) => 
       report.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       report.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      report.address.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    return matchesStatus && matchesSearch;
-  });
+      report.address.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [filteredReports, searchQuery]);
+
+  // Get report count
+  const reportCount = searchFilteredReports.length;
+
+
+
+  // Handle status update
+  const handleStatusUpdate = (reportId: number, status: string) => {
+    return apiRequest(`/reports/${reportId}/status`, "PUT", { status })
+      .then(() => {
+        queryClient.invalidateQueries({ queryKey: ["/reports"] });
+      })
+      .catch((error) => {
+        toast({
+          title: "Error",
+          description: "Failed to update report status",
+          variant: "destructive",
+        });
+      });
+  };
+
+  // Check if user is admin
+  const isAdmin = true; // TODO: Implement proper admin check
 
   return (
     <>
@@ -134,8 +191,13 @@ const UserReports: React.FC = () => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {filteredReports?.map((report) => (
-                    <ReportCard key={report.id} report={report} />
+                  {searchFilteredReports.map((report) => (
+                    <ReportCard
+                      key={report.id}
+                      report={report}
+                      isAdmin={isAdmin}
+                      onUpdateStatus={handleStatusUpdate}
+                    />
                   ))}
                 </div>
               )}

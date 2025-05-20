@@ -6,7 +6,7 @@ import AboutSection from "@/components/about-section";
 import HowItWorksSection from "@/components/how-it-works-section";
 import RewardsSection from "@/components/rewards-section";
 import ContactSection from "@/components/contact-section";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 
 const Landing: React.FC = () => {
   return (

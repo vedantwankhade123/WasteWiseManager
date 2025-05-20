@@ -4,7 +4,7 @@ import { Facebook, Twitter, Instagram, Linkedin, MapPin, Phone, Mail } from "luc
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-gray-900 text-white pt-12 pb-6">
+    <footer className="bg-gray-900 text-white pt-12 pb-6 m-2.5" style={{ borderRadius: "10px" }}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
@@ -46,7 +46,7 @@ const Footer: React.FC = () => {
               </a>
             </div>
           </div>
-          
+
           <div>
             <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
@@ -87,7 +87,7 @@ const Footer: React.FC = () => {
               </li>
             </ul>
           </div>
-          
+
           <div>
             <h4 className="text-lg font-semibold mb-4">Resources</h4>
             <ul className="space-y-2">
@@ -121,26 +121,49 @@ const Footer: React.FC = () => {
               </li>
             </ul>
           </div>
-          
+
           <div>
             <h4 className="text-lg font-semibold mb-4">Contact Info</h4>
-            <ul className="space-y-2 text-gray-400">
-              <li className="flex items-start space-x-2">
-                <MapPin className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span>123 Clean Street, Green City, 56789</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <Phone className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span>+1 (123) 456-7890</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <Mail className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <span>contact@cleancity.com</span>
-              </li>
-            </ul>
+            <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                <div className="flex-shrink-0">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <MapPin className="w-6 h-6 text-primary" />
+                  </div>
+                </div>
+                <div>
+                  <p className="text-gray-400 text-sm">Location</p>
+                  <p className="text-white font-medium">Amravati, Maharashtra, India</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <div className="flex-shrink-0">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Phone className="w-6 h-6 text-primary" />
+                  </div>
+                </div>
+                <div>
+                  <p className="text-gray-400 text-sm">Phone</p>
+                  <p className="text-white font-medium">(+91) 9175988560</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <div className="flex-shrink-0">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Mail className="w-6 h-6 text-primary" />
+                  </div>
+                </div>
+                <div>
+                  <p className="text-gray-400 text-sm">Email</p>
+                  <p className="text-white font-medium">vedantwankhade47@gmail.com</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        
+
         <div className="border-t border-gray-800 pt-6 text-center text-gray-500 text-sm">
           <p>&copy; {new Date().getFullYear()} CleanCity. All rights reserved.</p>
         </div>

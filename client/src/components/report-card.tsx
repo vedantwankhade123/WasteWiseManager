@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, MoreVertical } from "lucide-react";
+import { MapPin, MoreVertical, Trash2 } from "lucide-react";
 import { Report } from "@shared/schema";
 import { 
   DropdownMenu,
@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import ReportStatusBadge from "@/components/report-status-badge";
 import { formatDate, formatRewardPoints, timeAgo, truncateText } from "@/lib/utils";
-import { Link } from "wouter";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { apiRequest } from "@/lib/api";
 
 interface ReportCardProps {
   report: Report;
@@ -22,12 +22,15 @@ interface ReportCardProps {
 
 const ReportCard: React.FC<ReportCardProps> = ({ report, isAdmin = false, onUpdateStatus }) => {
   const [showDetailsDialog, setShowDetailsDialog] = React.useState(false);
-  
+
+
   const handleStatusUpdate = (status: string) => {
     if (onUpdateStatus) {
       onUpdateStatus(report.id, status);
     }
   };
+
+
   
   return (
     <>
@@ -68,26 +71,25 @@ const ReportCard: React.FC<ReportCardProps> = ({ report, isAdmin = false, onUpda
                       View Details
                     </DropdownMenuItem>
                     
-                    {isAdmin && report.status === "pending" && (
+                    {isAdmin && (
                       <DropdownMenuItem onClick={() => handleStatusUpdate("processing")}>
                         Mark as Processing
                       </DropdownMenuItem>
                     )}
                     
-                    {isAdmin && (report.status === "pending" || report.status === "processing") && (
+                    {isAdmin && (
                       <DropdownMenuItem onClick={() => handleStatusUpdate("completed")}>
                         Mark as Completed
                       </DropdownMenuItem>
                     )}
                     
-                    {isAdmin && report.status === "pending" && (
-                      <DropdownMenuItem 
-                        onClick={() => handleStatusUpdate("rejected")}
-                        className="text-destructive"
-                      >
-                        Reject Report
+                    {isAdmin && (
+                      <DropdownMenuItem onClick={() => handleStatusUpdate("rejected")}>
+                        Mark as Rejected
                       </DropdownMenuItem>
                     )}
+                    
+
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
